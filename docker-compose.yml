@@ -1,0 +1,93 @@
+services:
+  # PostgreSQL con pgvector
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: hogar-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: hogar
+      POSTGRES_PASSWORD: hogar_dev_password
+      POSTGRES_DB: hogar
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U hogar"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # Redis (opcional para Socket.io)
+  redis:
+    image: redis:7-alpine
+    container_name: hogar-redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # Meilisearch para búsqueda
+  meilisearch:
+    image: getmeili/meilisearch:v1.11
+    container_name: hogar-meilisearch
+    restart: unless-stopped
+    environment:
+      MEILI_ENV: development
+      MEILI_MASTER_KEY: hogar_meili_dev_key
+      MEILI_NO_ANALYTICS: true
+    volumes:
+      - meilisearch_data:/meili_data
+    ports:
+      - "7700:7700"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:7700/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # MinIO para almacenamiento S3-compatible
+  minio:
+    image: minio/minio:latest
+    container_name: hogar-minio
+    restart: unless-stopped
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: hogar_minio
+      MINIO_ROOT_PASSWORD: hogar_minio_dev_password
+    volumes:
+      - minio_data:/data
+    ports:
+      - "9000:9000"  # API
+      - "9001:9001"  # Console
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Mailpit para emails en desarrollo
+  mailpit:
+    image: axllent/mailpit:latest
+    container_name: hogar-mailpit
+    restart: unless-stopped
+    ports:
+      - "8025:8025"  # Web UI
+      - "1025:1025"  # SMTP
+    environment:
+      MP_MAX_MESSAGES: 500
+      MP_SMTP_AUTH_ACCEPT_ANY: 1
+      MP_SMTP_AUTH_ALLOW_INSECURE: 1
+
+volumes:
+  postgres_data:
+  redis_data:
+  meilisearch_data:
+  minio_data:

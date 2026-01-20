@@ -175,7 +175,7 @@ export async function getUserStats() {
       .where(
         and(
           eq(orders.userId, session.user.id),
-          eq(orders.paymentStatus, 'paid')
+          eq(orders.paymentStatus, 'completed')
         )
       ),
   ])

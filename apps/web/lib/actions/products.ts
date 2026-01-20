@@ -45,9 +45,8 @@ export async function getProducts(filters: ProductFilters = {}) {
     conditions.push(sql`${products.basePrice} <= ${rest.maxPrice}`)
   }
 
-  // Solo productos activos y publicados
-  conditions.push(eq(products.isActive, true))
-  conditions.push(eq(products.isPublished, true))
+  // Solo productos activos
+  conditions.push(eq(products.status, 'active'))
 
   const whereClause = conditions.length > 0 ? and(...conditions) : undefined
 
@@ -113,11 +112,7 @@ export async function getProductBySlug(slug: string) {
 
 export async function getFeaturedProducts(limit = 8) {
   return db.query.products.findMany({
-    where: and(
-      eq(products.isActive, true),
-      eq(products.isPublished, true),
-      eq(products.isFeatured, true)
-    ),
+    where: eq(products.status, 'active'),
     with: {
       images: {
         orderBy: (images, { asc }) => [asc(images.order)],
@@ -139,8 +134,7 @@ export async function getProductsByProvider(providerId: string, limit = 10) {
   return db.query.products.findMany({
     where: and(
       eq(products.providerId, providerId),
-      eq(products.isActive, true),
-      eq(products.isPublished, true)
+      eq(products.status, 'active')
     ),
     with: {
       images: {

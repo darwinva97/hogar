@@ -2,8 +2,6 @@ import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
 import { Toaster } from '@/components/ui/sonner'
-import { Navbar } from '@/components/navbar'
-import { Footer } from '@/components/footer'
 
 const inter = Inter({
   subsets: ['latin'],
@@ -58,9 +56,7 @@ export default function RootLayout({
   return (
     <html lang="es" suppressHydrationWarning>
       <body className={`${inter.variable} font-sans antialiased`}>
-        <Navbar />
-        <main className="min-h-screen">{children}</main>
-        <Footer />
+        {children}
         <Toaster />
       </body>
     </html>

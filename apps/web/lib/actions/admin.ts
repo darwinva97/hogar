@@ -32,12 +32,12 @@ export async function getAdminStats() {
     db
       .select({ total: sql<number>`COALESCE(SUM(${orders.total}::numeric), 0)` })
       .from(orders)
-      .where(eq(orders.paymentStatus, 'paid')),
+      .where(eq(orders.paymentStatus, 'completed')),
     db
       .select({ total: sql<number>`COALESCE(SUM(${orders.total}::numeric), 0)` })
       .from(orders)
       .where(
-        and(eq(orders.paymentStatus, 'paid'), gte(orders.createdAt, startOfMonth))
+        and(eq(orders.paymentStatus, 'completed'), gte(orders.createdAt, startOfMonth))
       ),
     db.select({ count: count() }).from(users),
     db.select({ count: count() }).from(providers),

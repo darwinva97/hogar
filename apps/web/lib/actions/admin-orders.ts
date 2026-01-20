@@ -115,7 +115,7 @@ export async function updateOrderStatus(
 
 export async function updatePaymentStatus(
   orderId: string,
-  paymentStatus: 'pending' | 'paid' | 'failed' | 'refunded',
+  paymentStatus: 'pending' | 'processing' | 'completed' | 'failed' | 'refunded',
   data?: {
     paymentReference?: string
     paymentMethod?: string
@@ -137,7 +137,7 @@ export async function updatePaymentStatus(
     updateData.paymentMethod = data.paymentMethod
   }
 
-  if (paymentStatus === 'paid') {
+  if (paymentStatus === 'completed') {
     updateData.paidAt = new Date()
   }
 
@@ -155,7 +155,7 @@ export async function updatePaymentStatus(
   })
 
   // If paid and status is pending, auto-confirm
-  if (paymentStatus === 'paid') {
+  if (paymentStatus === 'completed') {
     const order = await db.query.orders.findFirst({
       where: eq(orders.id, orderId),
     })

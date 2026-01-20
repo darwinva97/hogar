@@ -1,10 +1,15 @@
-import { db } from './index'
+import "./seed-env";
+import { db } from './client'
 import { categories, users } from './schema'
+import bcrypt from 'bcryptjs'
 
 async function seed() {
   console.log('🌱 Seeding database...')
 
-  // Crear usuario admin
+  // Crear usuario admin con password
+  const adminPassword = 'admin123' // Cambiar en producción
+  const passwordHash = await bcrypt.hash(adminPassword, 12)
+
   const [adminUser] = await db
     .insert(users)
     .values({
@@ -12,11 +17,14 @@ async function seed() {
       name: 'Admin Hogar',
       role: 'admin',
       emailVerified: true,
+      passwordHash,
     })
     .onConflictDoNothing()
     .returning()
 
   console.log('✅ Admin user created:', adminUser?.email)
+  console.log('   📧 Email: admin@hogar.pe')
+  console.log('   🔑 Password: admin123')
 
   // Crear categorías principales
   const mainCategories = [

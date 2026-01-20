@@ -120,6 +120,12 @@ export async function register(
   const user = await createUser({ name, email, password })
 
   // Crear sesión
+  if (!user) {
+    return {
+      success: false,
+      error: 'Error al crear el usuario',
+    }
+  }
   await createSession(user.id)
 
   redirect('/')

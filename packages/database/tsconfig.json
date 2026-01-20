@@ -1,9 +1,11 @@
 {
-  "extends": "@hogar/typescript-config/node.json",
+  "extends": "@hogar/typescript-config/base.json",
   "compilerOptions": {
-    "outDir": "dist",
-    "rootDir": "src"
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"]
+    }
   },
-  "include": ["src/**/*"],
-  "exclude": ["node_modules", "dist"]
+  "include": ["src", "drizzle.config.ts"],
+  "exclude": ["node_modules"]
 }
